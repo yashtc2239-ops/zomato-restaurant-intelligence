@@ -1,5 +1,5 @@
 # 🍕 Zomato Restaurant Intelligence
-**End-to-End Data Analytics + Deployed Web Application | VIT Pune Final Year Portfolio**
+**End-to-End Data Analytics + Deployed Web Application | VIT Pune 3rd Year Portfolio**
 
 **Author:** Yash Chavan | B.Tech CSE-DS | VIT Pune | 2024-28
 **Live App:** [zomato-growth-navigator.streamlit.app](https://zomato-growth-navigator.streamlit.app)
@@ -199,5 +199,5 @@ http://localhost:8501
 
 ---
 
-*Built as 2nd year B.Tech CSE-DS portfolio project | VIT Pune | 2024-28*
+*Built as 3rd year B.Tech CSE-DS portfolio project | VIT Pune | 2024-28*
 
