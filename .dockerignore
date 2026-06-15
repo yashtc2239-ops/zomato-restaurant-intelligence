@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Python cache — never include compiled bytecode
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Jupyter notebooks (not needed in production)
+notebooks/
+*.ipynb
+.ipynb_checkpoints/
+
+# Raw data (too large, loaded separately)
+data/raw/
+
+# Power BI files
+dashboard/
+*.pbix
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE config
+.vscode/
+.idea/
+
+# Streamlit local config
+.streamlit/secrets.toml
+
+# Test files
+tests/
+*.test.py
