@@ -85,7 +85,7 @@ st.markdown("""
 @st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
     """Load and return the cleaned Bengaluru dataset with engineered columns."""
-    df = pd.read_csv("data/bengaluru_cleaned.csv")
+    df = pd.read_csv("bengaluru_cleaned.csv")
 
     # Rating categories
     bins   = [0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.1]
