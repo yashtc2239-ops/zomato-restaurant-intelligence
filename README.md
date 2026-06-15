@@ -199,5 +199,5 @@ http://localhost:8501
 
 ---
 
-*Built as final year B.Tech CSE-DS portfolio project | VIT Pune | 2024-28*
+*Built as 2nd year B.Tech CSE-DS portfolio project | VIT Pune | 2024-28*
 
