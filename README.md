@@ -192,10 +192,10 @@ http://localhost:8501
 
 ## Dataset Source
 
-- Zomato Bengaluru: [kaggle.com/datasets/himanshupoddar/zomato-bangalore-restaurants](https://www.kaggle.com/datasets/himanshupoddar/zomato-bangalore-restaurants)
-- Zomato Global: [kaggle.com/datasets/shrutimehta/zomato-restaurants-data](https://www.kaggle.com/datasets/shrutimehta/zomato-restaurants-data)
+- **Primary Dataset:** [Zomato Bengaluru Restaurants](https://www.kaggle.com/datasets/himanshupoddar/zomato-bangalore-restaurants)
+  - This dataset was used for all phases, including data cleaning, exploratory data analysis, SQL querying, ML modeling, and the final web application deployment.
 
-*Raw data files not included in repo due to size (547MB). Download from Kaggle links above.*
+*Note: The raw data file is not included in this repository to comply with GitHub file size limits. Please download it from the Kaggle link above to run the project locally.*
 
 ---
 
