@@ -149,7 +149,7 @@ zomato-restaurant-intelligence/
 │   └── business_queries.sql      ← All SQL queries reference file
 │
 └── reports/
-    ├── Phase8_Business_Report.pdf ← Full business analysis report
+    ├── Zomato_Market_Intelligence_Report_Yash_Chavan.pdf ← Full business analysis report
     ├── expansion_score.png        ← Expansion priority chart
     ├── feature_importance.png     ← ML feature importance chart
     ├── chart1_rating_distribution.png
