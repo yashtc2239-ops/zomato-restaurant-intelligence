@@ -493,124 +493,114 @@ def render_location(df: pd.DataFrame) -> None:
 
 # ─── PAGE 3: CUISINE ANALYSIS ───────────────────────────────────────────────
 def render_cuisine(df: pd.DataFrame) -> None:
-    """Render the Cuisine & Business Analysis page."""
+    """Render the Cuisine & Business Analysis page with robust error handling."""
+    
+    # 1. Immediate guard clause: If no data, stop here
     if df.empty:
         st.warning("No data for selected filters. Try adjusting the sidebar.")
         return
+        
     col1, col2 = st.columns(2)
 
+    # --- TOP 10 SUPPLIED CUISINES ---
     with col1:
-        st.markdown("<div class='section-header'>🍜 Top 10 Cuisines by Supply</div>",
-                    unsafe_allow_html=True)
-        cuisine_counts = (
-            df["cuisines"].str.split(",").explode().str.strip()
-            .value_counts().head(10)
-        )
-        fig = px.bar(
-            x=cuisine_counts.values[::-1],
-            y=cuisine_counts.index[::-1],
-            orientation="h",
-            color=cuisine_counts.values[::-1],
-            color_continuous_scale=["#aad4f5", "#1565c0"],
-            text=cuisine_counts.values[::-1],
-            labels={"x": "Restaurant Count", "y": ""},
-        )
-        fig.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=340, margin=dict(l=0, r=20, t=10, b=10),
-            coloraxis_showscale=False,
-        )
-        fig.update_traces(textposition="outside", textfont_size=10)
-        st.plotly_chart(fig, use_container_width=True)
+        st.markdown("<div class='section-header'>🍜 Top 10 Cuisines by Supply</div>", unsafe_allow_html=True)
+        cuisine_list = df["cuisines"].dropna().str.split(",").explode().str.strip()
+        if not cuisine_list.empty:
+            cuisine_counts = cuisine_list.value_counts().head(10)
+            fig = px.bar(
+                x=cuisine_counts.values[::-1],
+                y=cuisine_counts.index[::-1],
+                orientation="h",
+                color=cuisine_counts.values[::-1],
+                color_continuous_scale=["#aad4f5", "#1565c0"],
+                text=cuisine_counts.values[::-1],
+                labels={"x": "Restaurant Count", "y": ""},
+            )
+            fig.update_layout(plot_bgcolor="white", paper_bgcolor="white", height=340, margin=dict(l=0, r=20, t=10, b=10), coloraxis_showscale=False)
+            fig.update_traces(textposition="outside", textfont_size=10)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("No cuisine data available.")
 
+    # --- TOP 10 QUALITY CUISINES ---
     with col2:
-        st.markdown("<div class='section-header'>⭐ Top 10 Cuisines by Quality</div>",
-                    unsafe_allow_html=True)
+        st.markdown("<div class='section-header'>⭐ Top 10 Cuisines by Quality</div>", unsafe_allow_html=True)
+        
         cuisine_rating = (
             df.groupby("primary_cuisine")["rate"]
             .agg(["mean", "count"])
-            .query("count >= 100")
+            .query("count >= 1")
             .sort_values("mean", ascending=False)
             .head(10)
             .reset_index()
         )
-        fig = px.bar(
-            x=cuisine_rating["mean"][::-1],
-            y=cuisine_rating["primary_cuisine"][::-1],
-            orientation="h",
-            color=cuisine_rating["mean"][::-1],
-            color_continuous_scale=["#91cf60", "#006837"],
-            text=cuisine_rating["mean"][::-1].round(2),
-            labels={"x": "Avg Rating", "y": ""},
-        )
-        fig.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=340, margin=dict(l=0, r=20, t=10, b=10),
-            coloraxis_showscale=False,
-            xaxis=dict(range=[3.8, 4.6]),
-        )
-        fig.update_traces(textposition="outside", textfont_size=10)
-        st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("""<div class='insight-box'>
-        💡 <b>Insight:</b> North Indian dominates supply (17K+ restaurants)
-        but <b>Modern Indian, European & Mediterranean</b> lead in quality (4.2+ avg).
-        This is an underserved premium segment — high demand, low supply.
-    </div>""", unsafe_allow_html=True)
+        if not cuisine_rating.empty:
+            fig = px.bar(
+                cuisine_rating,
+                x='mean',
+                y='primary_cuisine',
+                orientation="h",
+                color='mean',
+                color_continuous_scale=["#91cf60", "#006837"],
+                text=cuisine_rating['mean'].round(2),
+                labels={"mean": "Avg Rating", "primary_cuisine": ""},
+            )
+            fig.update_yaxes(autorange="reversed")
+            fig.update_layout(
+                plot_bgcolor="white", paper_bgcolor="white",
+                height=340, margin=dict(l=0, r=20, t=10, b=10),
+                coloraxis_showscale=False,
+                xaxis=dict(range=[3.5, 4.7]),
+            )
+            fig.update_traces(textposition="outside", textfont_size=10)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.warning("Insufficient data for cuisine quality analysis.")
 
-    # Table booking impact
-    st.markdown("<div class='section-header'>📅 Table Booking — Premium Segment Signal</div>",
-                unsafe_allow_html=True)
+    # --- TABLE BOOKING SECTION ---
+    st.markdown("<div class='section-header'>📅 Table Booking — Premium Segment Signal</div>", unsafe_allow_html=True)
 
     col3, col4 = st.columns(2)
 
+    booking_stats = df.groupby("booking_label")[["rate", "cost_for_two"]].mean().reset_index()
+
     with col3:
-        booking_stats = (
-            df.groupby("booking_label")[["rate", "cost_for_two"]]
-            .mean().reset_index()
-        )
-        fig = px.bar(
-            booking_stats,
-            x="booking_label",
-            y="rate",
-            color="booking_label",
-            color_discrete_map={"Table Booking": "#1a9850", "No Booking": "#E23744"},
-            text=booking_stats["rate"].round(2),
-            labels={"booking_label": "", "rate": "Avg Rating"},
-        )
-        fig.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white",
-            showlegend=False, height=280,
-            margin=dict(l=0, r=0, t=10, b=10),
-            yaxis=dict(range=[3.0, 4.5]),
-        )
-        fig.update_traces(textposition="outside", textfont_size=14, textfont_color="black")
-        st.plotly_chart(fig, use_container_width=True)
+        if not booking_stats.empty:
+            fig = px.bar(
+                booking_stats,
+                x="booking_label",
+                y="rate",
+                color="booking_label",
+                color_discrete_map={"Table Booking": "#1a9850", "No Booking": "#E23744"},
+                text=booking_stats["rate"].round(2),
+                labels={"booking_label": "", "rate": "Avg Rating"},
+            )
+            fig.update_layout(plot_bgcolor="white", paper_bgcolor="white", showlegend=False, height=280, margin=dict(l=0, r=0, t=10, b=10), yaxis=dict(range=[3.0, 4.5]))
+            fig.update_traces(textposition="outside", textfont_size=14, textfont_color="black")
+            st.plotly_chart(fig, use_container_width=True)
 
     with col4:
-        fig = px.bar(
-            booking_stats,
-            x="booking_label",
-            y="cost_for_two",
-            color="booking_label",
-            color_discrete_map={"Table Booking": "#1a9850", "No Booking": "#E23744"},
-            text=booking_stats["cost_for_two"].round(0),
-            labels={"booking_label": "", "cost_for_two": "Avg Cost (₹)"},
-        )
-        fig.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white",
-            showlegend=False, height=280,
-            margin=dict(l=0, r=0, t=10, b=10),
-        )
-        fig.update_traces(textposition="outside", textfont_size=13, textfont_color="black")
-        st.plotly_chart(fig, use_container_width=True)
+        if not booking_stats.empty:
+            fig = px.bar(
+                booking_stats,
+                x="booking_label",
+                y="cost_for_two",
+                color="booking_label",
+                color_discrete_map={"Table Booking": "#1a9850", "No Booking": "#E23744"},
+                text=booking_stats["cost_for_two"].round(0),
+                labels={"booking_label": "", "cost_for_two": "Avg Cost (₹)"},
+            )
+            fig.update_layout(plot_bgcolor="white", paper_bgcolor="white", showlegend=False, height=280, margin=dict(l=0, r=0, t=10, b=10))
+            fig.update_traces(textposition="outside", textfont_size=13, textfont_color="black")
+            st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""<div class='insight-box'>
         💡 <b>Insight:</b> Table booking restaurants rate <b>0.52 points higher</b>
         (4.14 vs 3.62) and charge <b>2.6x more</b> (₹1,276 vs ₹482).
         This is the single strongest binary predictor of restaurant quality in the dataset.
     </div>""", unsafe_allow_html=True)
-
 
 # ─── PAGE 4: ML MODEL ───────────────────────────────────────────────────────
 def render_ml(df: pd.DataFrame) -> None:
